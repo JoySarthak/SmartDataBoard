@@ -59,8 +59,11 @@ How to select appropiate model for training:
         model_type = st.selectbox(
             "**Choose a model**",
             ["Linear Regression","Logistic Regression","KNN Regressor","Decision Tree Regressor","Decision Tree Classifier",
-             "KNN Classifier","Naive_Bayes Classifier",
-             "Support Vector Machine"]
+             "KNN Classifier","Naive_Bayes Classifier","Support Vector Machine",
+             "Random Forest Classifier","Random Forest Regressor",
+             "AdaBoost Classifier","AdaBoost Regressor",
+             "Gradient Boosting Classifier","Gradient Boosting Regressor",
+             "XGBoost Classifier","XGBoost Regressor"]
         )
     st.markdown("▶ Features represent the :violet-background[independant variables] from which the model learns to predict the " \
     ":green-background[dependant variable 'target']")
@@ -79,10 +82,13 @@ How to select appropiate model for training:
             model = data_models.train_model(X_train, y_train, model_type)
             st.session_state.trained_model = model
             
+        if st.session_state.trained_model is not None:  
+            model = st.session_state.trained_model
             if select == "Multivariate":
                 data_models.evaluate_Multitarget_model(model, X_test, y_test)
             else:
                 data_models.evaluate_binary_model(model, X_test, y_test)
+                
         with st.expander("Test Predictions : "):
         # Add prediction section after model training
             if st.session_state.trained_model is not None:

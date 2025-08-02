@@ -237,7 +237,7 @@ def Graph_pie(df, opt, mode, colors):
         value_counts = search_tool(df, opt, "pie_s")
     value_counts.columns = ['category', 'count']
     
-    threshold = st.slider("Select Threshold", 20, 200, 25, key=mode)
+    threshold = st.slider("Select Threshold", 1, 200, 25, key=mode)
     small_categories = value_counts[value_counts['count'] < threshold]
     big_categories = value_counts[value_counts['count'] >= threshold]
     
