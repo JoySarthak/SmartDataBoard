@@ -1,0 +1,7 @@
+# Ignore all .pkl files
+*.pkl
+
+# Python cache and virtualenv
+__pycache__/
+*.py[cod]
+venv/
