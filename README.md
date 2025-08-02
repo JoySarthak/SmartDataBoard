@@ -1,6 +1,7 @@
 # 📊 Smartboard: Dataset Analyser & Model Trainer
 
 > 🚀 An interactive **Streamlit** platform for dataset analysis, cleaning, visualization, encoding, and **machine learning** model training — all without writing code.
+> Smartboard is an interactive data analysis and machine learning platform built with [Streamlit](https://streamlit.io/). It enables users to upload datasets, perform exploratory data analysis, clean data, encode features, visualize trends, and train machine learning models—all through a user-friendly web interface.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.32+-ff4b4b?logo=streamlit)
@@ -36,14 +37,18 @@
 | 🤖 [**scikit-learn**](https://scikit-learn.org/) | ML toolkit |
 | ⚡ [**XGBoost**](https://xgboost.readthedocs.io/) | Gradient boosting |
 
-DatasetAnalyser/
-│
-├── app.py          # Main entry point
-├── pages/          # Streamlit multipage modules
-├── src/            # Core processing & ML logic
-├── data/           # Sample datasets & images
-├── output/         # Generated processed files
-└── requirements.txt
+**Navigate through the sidebar to access different modules:**
+   - Data Analysis (Overview, Subjective Analysis, Visualise Data)
+   - Model Training (Data Encoding, Data Training, Prediction Model)
+
+## Project Structure
+
+- `app.py` — Main entry point, sets up navigation.
+- `pages/` — Streamlit multipage app modules.
+- `src/` — Core data processing, cleaning, visualization, and ML logic.
+- `data/` — Sample datasets and images.
+- `output/` — Generated outputs (e.g., processed files). #future updates
+
 
 Developed using streamlit. More updates soon
 live at : https://datascience-smart-dashboard.streamlit.app/
