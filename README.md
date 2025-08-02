@@ -1,94 +1,49 @@
-# Smartboard: Dataset Analyser & Model Trainer
+# 📊 Smartboard: Dataset Analyser & Model Trainer
 
-Smartboard is an interactive data analysis and machine learning platform built with [Streamlit](https://streamlit.io/). It enables users to upload datasets, perform exploratory data analysis, clean data, encode features, visualize trends, and train machine learning models—all through a user-friendly web interface.
+> 🚀 An interactive **Streamlit** platform for dataset analysis, cleaning, visualization, encoding, and **machine learning** model training — all without writing code.
 
-## Features
-
-- **Data Overview:**  
-  - Upload CSV datasets.
-  - View dataframe, summary statistics, and data types.
-  - Visualize missing values (bar, pie, line charts).
-  - Download cleaned or processed datasets.
-
-- **Data Cleaning:**  
-  - Drop or replace NaN values.
-  - Remove duplicate rows.
-  - Drop unwanted features (columns).
-  - Remove outliers.
-
-- **Subjective Analysis:**  
-  - Search and filter data by column.
-  - Value counts and group-by operations.
-  - Replace values selectively.
-
-- **Data Visualization:**  
-  - Bar, line, area, and pie charts for feature distributions.
-  - Customizable color schemes.
-
-- **Data Encoding:**  
-  - Encode categorical features using OrdinalEncoder or LabelEncoder.
-  - Download encoded datasets and encoder objects for reuse.
-
-- **Model Training:**  
-  - Select features and target variable.
-  - Choose from multiple ML models:  
-    - Linear Regression, Logistic Regression  
-    - KNN, Decision Tree, Random Forest  
-    - AdaBoost, Gradient Boosting  
-    - XGBoost  
-    - Naive Bayes, SVM
-  - Train/test split, model evaluation (accuracy, F1, MAE, R2, etc.).
-  - Download trained models.
-
-## Libraries Used
-
-- [Streamlit](https://streamlit.io/) (version 1.32+ recommended)
-- [Pandas](https://pandas.pydata.org/)
-- [NumPy](https://numpy.org/)
-- [Plotly](https://plotly.com/python/)
-- [Seaborn](https://seaborn.pydata.org/)
-- [Matplotlib](https://matplotlib.org/)
-- [scikit-learn](https://scikit-learn.org/)
-- [XGBoost](https://xgboost.readthedocs.io/)
-
-## Getting Started
-
-1. **Clone the repository:**
-   ```sh
-   git clone <repo-url>
-   cd DatasetAnalyser
-   ```
-
-2. **Install dependencies:**
-   ```sh
-   pip install -r requirements.txt
-   ```
-
-3. **Run the app:**
-   ```sh
-   streamlit run app.py
-   ```
-
-4. **Navigate through the sidebar to access different modules:**
-   - Data Analysis (Overview, Subjective Analysis, Visualise Data)
-   - Model Training (Data Encoding, Data Training, Prediction Model)
-
-## Project Structure
-
-- `app.py` — Main entry point, sets up navigation.
-- `pages/` — Streamlit multipage app modules.
-- `src/` — Core data processing, cleaning, visualization, and ML logic.
-- `data/` — Sample datasets and images.
-- `output/` — Generated outputs (e.g., processed files).
-
-## Screenshots
-
-*(Add screenshots of the UI here)*
-
-## License
-
-MIT License
+![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.32+-ff4b4b?logo=streamlit)
+![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-150458?logo=pandas)
+![License](https://img.shields.io/badge/License-MIT-green)
+![GitHub last commit](https://img.shields.io/github/last-commit/your-username/DatasetAnalyser?logo=github)
 
 ---
 
-*Developed with ❤️ using
+## ✨ Features
+
+| Category | Features |
+|----------|----------|
+| 📄 **Data Overview** | Upload CSV, view dataframe & stats, visualize missing values (bar, pie, line), download processed datasets |
+| 🧹 **Data Cleaning** | Drop/replace NaN, remove duplicates, drop columns, remove outliers |
+| 🔍 **Subjective Analysis** | Search/filter data, value counts, group-by, replace values selectively |
+| 📈 **Visualization** | Bar, line, area, pie charts with custom colors |
+| 🏷 **Data Encoding** | OrdinalEncoder, LabelEncoder, download encoded data & encoder |
+| 🤖 **Model Training** | Multiple ML models (LR, Logistic, KNN, Tree, RF, Boosting, XGBoost, Naive Bayes, SVM), train/test split, accuracy, F1, MAE, R², download trained models |
+
+---
+
+## 📚 Libraries Used
+
+| Library | Purpose |
+|---------|---------|
+| 🖥 [**Streamlit**](https://streamlit.io/) | Interactive UI framework |
+| 🐼 [**Pandas**](https://pandas.pydata.org/) | Data manipulation |
+| 🔢 [**NumPy**](https://numpy.org/) | Numerical computing |
+| 📊 [**Plotly**](https://plotly.com/python/) | Interactive visualizations |
+| 🎨 [**Seaborn**](https://seaborn.pydata.org/) | Statistical visualization |
+| 📉 [**Matplotlib**](https://matplotlib.org/) | Plotting library |
+| 🤖 [**scikit-learn**](https://scikit-learn.org/) | ML toolkit |
+| ⚡ [**XGBoost**](https://xgboost.readthedocs.io/) | Gradient boosting |
+
+DatasetAnalyser/
+│
+├── app.py          # Main entry point
+├── pages/          # Streamlit multipage modules
+├── src/            # Core processing & ML logic
+├── data/           # Sample datasets & images
+├── output/         # Generated processed files
+└── requirements.txt
+
+Developed using streamlit. More updates soon
+live at : https://datascience-smart-dashboard.streamlit.app/
