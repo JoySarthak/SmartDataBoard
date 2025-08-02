@@ -10,7 +10,7 @@ st.write("For machine learning models to perform optimally Data encoding is a cr
 " please complete and download the encoded dataset before proceeding to the Data training section")
 
 st.warning("⚠️ if your dataset contains null values or redundant elements please perform a cleanup before proceeding ⚠️", width=800)
-st.page_link("overview_data.py", icon="⬅", label="Cleaning tools")
+st.page_link("pages/overview_data.py", icon="⬅", label="Cleaning tools")
 
 uploaded_file = st.file_uploader("Upload your dataset", type=["csv"])
 if uploaded_file is not None:
@@ -40,7 +40,7 @@ if uploaded_file is not None:
     df = st.session_state["dataframe"]
     st.dataframe(df)
     
-    col1, col2, col3 = st.columns([0.6, 0.2, 0.2])  # Added column for encoder download
+    col1, col2, col3 = st.columns([0.25, 0.55, 0.2])  # Added column for encoder download
     with col1:
         st.download_button(
             label="Download encoded CSV",
@@ -56,8 +56,10 @@ if uploaded_file is not None:
             st.download_button(
                 label="Download Encoders",
                 data=open("encoders.pkl", "rb"),
+                icon=":material/download:",
                 file_name="encoders.pkl",
-                mime="application/octet-stream"
+                mime="application/octet-stream",
+                type="primary"
             )
     with col3:
-        st.page_link("ML_models.py", label="Goto Model Training ➡")
+        st.page_link("pages/ML_models.py", label="Goto Model Training ➡")
