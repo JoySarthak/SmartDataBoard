@@ -1,13 +1,13 @@
 # 📊 Smartboard: Dataset Analyser & Model Trainer
 
-> 🚀 An interactive **Streamlit** platform for dataset analysis, cleaning, visualization, encoding, and **machine learning** model training — all without writing code.
+> 🚀 An interactive **Streamlit** platform for **Datascience** and **machine learning** model training — all without writing code.
+
 > Smartboard is an interactive data analysis and machine learning platform built with [Streamlit](https://streamlit.io/). It enables users to upload datasets, perform exploratory data analysis, clean data, encode features, visualize trends, and train machine learning models—all through a user-friendly web interface.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.32+-ff4b4b?logo=streamlit)
 ![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-150458?logo=pandas)
 ![License](https://img.shields.io/badge/License-MIT-green)
-![GitHub last commit](https://img.shields.io/github/last-commit/your-username/DatasetAnalyser?logo=github)
 
 ---
 
@@ -52,3 +52,7 @@
 
 Developed using streamlit. More updates soon
 live at : https://datascience-smart-dashboard.streamlit.app/
+
+> Streamlit free community cloud only provides 1gb of processing power so please kindly be patient with the processing.
+
+> AI features and smart elements will soon be available in a different repository since the community cloud cannot provide such processing capacities
