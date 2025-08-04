@@ -83,3 +83,5 @@ with st.sidebar.expander("Quick access toolbar", expanded=True):
         handle_quick_access("SMART-TOOLS", "pages/Training_sm.py")
     if st.button("Visualize", type="secondary", use_container_width=True):
         handle_quick_access("EDA", "pages/visualise_data.py")
+
+st.sidebar.page_link("https://portfolio-joysarthaks-projects.vercel.app/", label="About Me", icon=":material/language:")
