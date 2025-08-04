@@ -14,7 +14,7 @@ def train_and_evaluate(models, X, y, typeT, progress_bar, status):
     
     for i, (name, model) in enumerate(models.items()):
         with st.spinner(f"Training {name}..."):
-            status.write(f"⚙️ Training model {i+1}/{total_models}: {name}")
+            status.write(f":material/group_work: Training model {i+1}/{total_models}: {name}")
             model.fit(X_train, y_train)
             y_pred = model.predict(X_test)
             
@@ -65,42 +65,42 @@ def display_results(results, best_model_name, metric_name):
     st.download_button("Download Best Model", "best_model.pkl")
 
 def smart_training(df, target_column):
-    with st.status("🚀 Smart Training in Progress...", expanded=True) as status:
+    with st.status(":material/network_intelligence: Smart Training in Progress...", expanded=True) as status:
         # Initialize progress bar
         progress_bar = st.progress(0, text="Starting smart training process...")
         
         # Step 1: Starting
-        status.write("🔍 Starting smart model training...")
+        status.write(":material/progress_activity: Starting smart model training...")
         progress_bar.progress(5, text="Initializing...")
         time.sleep(0.5)
         
         # Step 2: Preprocess
-        status.write("🔄 Encoding and preprocessing data...")
+        status.write(":material/cycle: Encoding and preprocessing data...")
         progress_bar.progress(20, text="Preprocessing data...")
         df, problem_type = smart_encode.preprocess_data(df, target_column)
-        status.write(f"✅ Detected problem type: **{problem_type}**")
+        status.write(f":material/token: Detected Target Prediction type: **{problem_type}**")
         time.sleep(0.5)
         
         # Step 3: Get models
-        status.write("📦 Preparing machine learning models...")
+        status.write(":material/data_thresholding: Preparing machine learning models...")
         progress_bar.progress(40, text="Loading models...")
         models = getModels.get_models(problem_type)
         model_count = len(models)
-        status.write(f"🧠 Testing {model_count} different models...")
+        status.write(f":material/search_insights: Testing {model_count} different models...")
         time.sleep(0.5)
         
         # Step 4: Train & evaluate
-        status.write("⚙️ Training models (this may take a while)...")
+        status.write(":material/model_training: Training models (this may take a while)...")
         progress_bar.progress(60, text="Training models...")
         X = df.drop(columns=[target_column])
         y = df[target_column]
         results = train_and_evaluate(models, X, y, problem_type, progress_bar, status)
         
         # Step 5: Find best model
-        status.write("🏁 Evaluating results...")
+        status.write(":material/compare_arrows: Comparing Models & Evaluating results...")
         progress_bar.progress(90, text="Finding best model...")
         best_model, best_metric, metric_name = get_best_model(results, problem_type)
-        status.write(f"🎉 Best model found: **{best_model}**!")
+        status.write(f":material/celebration: Best model found: **{best_model}**!")
         time.sleep(0.5)
         
         # Complete progress
@@ -108,5 +108,5 @@ def smart_training(df, target_column):
         time.sleep(0.5)
     
     # Step 6: Display results
-    st.balloons()
+    st.snow()
     display_results(results, best_model, metric_name)

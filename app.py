@@ -32,8 +32,8 @@ PAGES = {
     },
     "SMART-TOOLS": {
         "Smart Tools": [
-            {"title": "Smart-Analysis", "path": "pages/Analytics_sm.py"},
-            {"title": "Smart-Training", "path": "pages/Training_sm.py"}
+            {"title": "Smart-Training", "path": "pages/Training_sm.py"},
+            {"title": "Smart-Analysis", "path": "pages/Analytics_sm.py"}
         ]
     }
 }
@@ -77,6 +77,8 @@ with st.sidebar.expander("Quick access toolbar", expanded=True):
         handle_quick_access("EDA", "pages/overview_data.py")
     if st.button("Encoding", type="secondary", use_container_width=True):
         handle_quick_access("RESEARCH", "pages/ML_data_encoding.py")
+    if st.button("Manual Train", type="secondary", use_container_width=True):
+        handle_quick_access("RESEARCH", "pages/ML_models.py")
     if st.button("Smart-Train", type="secondary", use_container_width=True):
         handle_quick_access("SMART-TOOLS", "pages/Training_sm.py")
     if st.button("Visualize", type="secondary", use_container_width=True):
