@@ -10,7 +10,6 @@ st.write("For machine learning models to perform optimally Data encoding is a cr
 " please complete and download the encoded dataset before proceeding to the Data training section")
 
 st.warning("⚠️ if your dataset contains null values or redundant elements please perform a cleanup before proceeding ⚠️", width=800)
-st.page_link("pages/overview_data.py", icon="⬅", label="Cleaning tools")
 
 uploaded_file = st.file_uploader("Upload your dataset", type=["csv"])
 if uploaded_file is not None:

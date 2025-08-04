@@ -44,37 +44,55 @@ near 0: indicates no linear Relation""")
     st.subheader("Dataset splitting and Training:")        
     st.code("""
 How to select appropiate model for training:
-1. observe the correlation matrix properly
-2. if most of the values lies between -0.7 to 0.7 indicates classification models will be the appropiate choice
-3. if majority of the values are close to 1 or -1 indicates Regression models will be the best choice""")
-    st.markdown(''':green[However you will get access to almost all models along with proper performance metrics]''')
+1. observe the correlation matrix properly, to see if linear models will be best.
+2. if your target variable contains multiple variety of outputs, Regressor models will perform the best
+3. if your target variable contains only binary outputs, i.e yes/no use the classification models""")
+    st.markdown(''':green[However you will get access to almost all models along with proper performance metrics and freedom of choosing]''')
     st.markdown('''## :orange[Lets get started with selecting the Features and Target]''')
 
     st.markdown('''### :blue[Select the target & features:]''')
     col1, col2 = st.columns(2)
     with col1:
         features = st.multiselect("Select features (x)", df_model.columns, default=df_model.columns)
+        st.code('''for multiclass prediction choose a regressor model,
+for binary prediction choose a classification model''')
     with col2:
         target = st.selectbox("Select target (y)", df_model.drop(columns=features).columns)
-        model_type = st.selectbox(
-            "**Choose a model**",
-            ["Linear Regression","Logistic Regression","KNN Regressor","Decision Tree Regressor","Decision Tree Classifier",
-             "KNN Classifier","Naive_Bayes Classifier","Support Vector Machine",
-             "Random Forest Classifier","Random Forest Regressor",
-             "AdaBoost Classifier","AdaBoost Regressor",
-             "Gradient Boosting Classifier","Gradient Boosting Regressor",
-             "XGBoost Classifier","XGBoost Regressor"]
+        Regressor_m = st.selectbox(
+            "**Choose a Regressor model**",
+            ["Linear Regression","Logistic Regression","KNN Regressor","Decision Tree Regressor",
+             "Support Vector Machine",
+             "Random Forest Regressor",
+             "AdaBoost Regressor",
+             "Gradient Boosting Regressor",
+             "XGBoost Regressor"], index=None
         )
+        classification_m = st.selectbox(
+            "**Choose a Classification model**",
+            ["Logistic Regression","Decision Tree Classifier",
+             "KNN Classifier","Naive_Bayes Classifier","Support Vector Machine",
+             "Random Forest Classifier",
+             "AdaBoost Classifier",
+             "Gradient Boosting Classifier",
+             "XGBoost Classifier"], index=None
+        )
+        if Regressor_m:
+            model_type = Regressor_m
+        else:
+            model_type = classification_m
+
     st.markdown("▶ Features represent the :violet-background[independant variables] from which the model learns to predict the " \
     ":green-background[dependant variable 'target']")
+    st.markdown("▶ It is necessary to click on :red[Train model] after changing model selection, by default interface works with"
+    "Regressor models, clear regressor selection if you want to use a classification model")
 
     if target and features and model_type:
         X = df_model[features]
         y = df_model[target]
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, shuffle=True)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
 
-        select = st.radio("Select Metrics type : ", ["Multivariate","Binary"], horizontal=True, help="select Multivalue when target consists of wide"
-        " range of values for prediction and select Binary when target only consists of yes/no for prediction. !for linear models always select Multivalue")
+        select = st.radio("Select Metrics type : ", ["Multi-class","Binary"], horizontal=True, help="select Multi-class when target consists of wide"
+        " range of values for prediction and select Binary when target only consists of yes/no for prediction. !for linear models always select Multi-class")
         if 'trained_model' not in st.session_state:
             st.session_state.trained_model = None
             
@@ -84,7 +102,7 @@ How to select appropiate model for training:
             
         if st.session_state.trained_model is not None:  
             model = st.session_state.trained_model
-            if select == "Multivariate":
+            if select == "Multi-class":
                 data_models.evaluate_Multitarget_model(model, X_test, y_test)
             else:
                 data_models.evaluate_binary_model(model, X_test, y_test)

@@ -4,6 +4,11 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 from src import data_loader, data_subj, data_cleaner, data_graphs
+from streamlit.runtime.scriptrunner import get_script_run_ctx
+
+ctx = get_script_run_ctx()
+if ctx and hasattr(ctx, "uploaded_file_mgr"):
+    ctx.uploaded_file_mgr.max_upload_size = 500 * 1024 * 1024 
 import random
 
 def Generate_key():

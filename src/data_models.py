@@ -30,8 +30,6 @@ def train_model(X_train, y_train, model_type):
         model = KNeighborsRegressor(n_neighbors=5)
     elif model_type == "Naive_Bayes Classifier":
         model = GaussianNB()
-    elif model_type == "Support Vector Machine":
-        model = SVC(kernel="poly")
     elif model_type == "Decision Tree Classifier":
         model = DecisionTreeClassifier()
     elif model_type == "Decision Tree Regressor":
@@ -43,7 +41,8 @@ def train_model(X_train, y_train, model_type):
     elif model_type == "AdaBoost Classifier":
         model = AdaBoostClassifier()
     elif model_type == "AdaBoost Regressor":
-        model = AdaBoostRegressor()
+        base_estimator = DecisionTreeRegressor(max_depth=4)
+        model = AdaBoostRegressor(estimator=base_estimator)
     elif model_type == "Gradient Boosting Classifier":
         model = GradientBoostingClassifier()
     elif model_type == "Gradient Boosting Regressor":
