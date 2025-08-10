@@ -145,7 +145,7 @@ for binary prediction choose a classification model''')
                     if has_encodings and target in st.session_state.encoders:
                         target_encoder = st.session_state.encoders[target]
                         # For classification, use inverse_transform
-                        if select == "Binary" or select == "Multivariate":
+                        if select == "Binary" or select == "Multi-class":
                             decoded_prediction = target_encoder.inverse_transform(prediction.reshape(-1, 1))[0][0]
                             st.success(f"Predicted {target}: {decoded_prediction}")
                         # For regression with encoded target (less common), you might need different handling
