@@ -8,6 +8,15 @@ def DropNaN(df : pd.DataFrame):
     st.dataframe(Cdf.isna().sum().reset_index()
                  .rename(columns={'index': 'Attributes', 0: 'Missing Value Count'}))
     st.write(f"Number of Rows Removed : {len(df)-len(Cdf)}")
+    st.download_button(
+        label="Download cleaned CSV",
+        data=Cdf.to_csv(index=False).encode('utf-8'),
+        file_name="cleaned_data.csv",
+        mime="text/csv",
+        icon=":material/download:",
+        key="drop_all",
+        type="primary"
+    )
     return Cdf
 
 def ReplaceNaN(df : pd.DataFrame):

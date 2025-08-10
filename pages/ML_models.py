@@ -89,7 +89,7 @@ for binary prediction choose a classification model''')
     if target and features and model_type:
         X = df_model[features]
         y = df_model[target]
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
         select = st.radio("Select Metrics type : ", ["Multi-class","Binary"], horizontal=True, help="select Multi-class when target consists of wide"
         " range of values for prediction and select Binary when target only consists of yes/no for prediction. !for linear models always select Multi-class")

@@ -8,7 +8,7 @@ from Smart_tool import smart_encode, getModels
 import time
 
 def train_and_evaluate(models, X, y, typeT, progress_bar, status):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     results = {}
     total_models = len(models)
     
@@ -108,5 +108,4 @@ def smart_training(df, target_column):
         time.sleep(0.5)
     
     # Step 6: Display results
-    st.snow()
     display_results(results, best_model, metric_name)

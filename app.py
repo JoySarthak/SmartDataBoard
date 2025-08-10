@@ -20,7 +20,7 @@ PAGES = {
     "EDA": {
         "Data Analysis": [
             {"title": "Overview", "path": "pages/overview_data.py"},
-            {"title": "Subjective Analysis", "path": "pages/subjective_data.py"},
+            {"title": "Customize Data", "path": "pages/customz.py"},
             {"title": "Visualise Data", "path": "pages/visualise_data.py"}
         ]
     },

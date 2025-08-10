@@ -51,6 +51,8 @@ def train_model(X_train, y_train, model_type):
         model = XGBClassifier()
     elif model_type == "XGBoost Regressor":
         model = XGBRegressor()
+    elif model_type == "Support Vector Machine":
+        model = SVC(kernel="poly")
     else:
         raise ValueError("Unknown model type")
     

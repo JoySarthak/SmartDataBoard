@@ -13,8 +13,8 @@ def get_models(problem_type):
             "Gradient Boosting": GradientBoostingClassifier(),
             "ADA Boosting Classifier": AdaBoostClassifier(),
             "Decision Tree Classifier": DecisionTreeClassifier(),
-            "KNeighbors Classifier": KNeighborsClassifier(),
-            "SVC": SVC(),
+            "KNeighbors Classifier": KNeighborsClassifier(n_neighbors=5, weights="distance"),
+            "SVC": SVC(kernel='poly'),
             "XGB Classifier": XGBClassifier(),
         }
     else:  # Regression
