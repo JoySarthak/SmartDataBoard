@@ -8,7 +8,7 @@ from xgboost import XGBClassifier,XGBRegressor
 def get_models(problem_type):
     if problem_type == "classification":
         return {
-            "Logistic Regression": LogisticRegression(max_iter=1000),
+            "Logistic Regression": LogisticRegression(),
             "Random Forest": RandomForestClassifier(),
             "Gradient Boosting": GradientBoostingClassifier(),
             "ADA Boosting Classifier": AdaBoostClassifier(),

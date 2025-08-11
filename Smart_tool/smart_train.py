@@ -1,7 +1,7 @@
 import pickle
 import streamlit as st
 import numpy as np
-from sklearn.metrics import accuracy_score, mean_squared_error
+from sklearn.metrics import accuracy_score, mean_squared_error, r2_score, f1_score
 from sklearn.model_selection import train_test_split
 import pandas as pd
 from Smart_tool import smart_encode, getModels
@@ -20,10 +20,12 @@ def train_and_evaluate(models, X, y, typeT, progress_bar, status):
             
             if typeT.lower() == "classification":
                 score = accuracy_score(y_test, y_pred)
-                results[name] = {"accuracy": score, "Model": model}
+                score_f1 = f1_score(y_test, y_pred)
+                results[name] = {"accuracy": score, "Model": model, "F1" : score_f1}
             else:  # Regression
                 score = np.sqrt(mean_squared_error(y_test, y_pred))
-                results[name] = {"rmse": score, "Model": model}
+                score_r2 = r2_score(y_test, y_pred)
+                results[name] = {"rmse": score, "Model": model, "R2": score_r2}
             
             progress = (i + 1) / total_models
             progress_bar.progress(min(progress, 1.0))
@@ -43,21 +45,26 @@ def get_best_model(results, problem_type):
     
     return best_model_name, best_metric, metric_name
 
-def display_results(results, best_model_name, metric_name):
-    # 1. Show metrics table
-    col1, col2 = st.columns([0.6, 0.4])
-    with col2:
-        st.subheader("📊 Model Comparison")
-        metrics_df = pd.DataFrame(results).T
-        st.dataframe(metrics_df.iloc[:, 0:1]) 
-    
-    # 2. Plot metrics
-    with col1:
-        st.bar_chart(metrics_df[metric_name], height=550)
-    
-    # 3. Show best model
+def display_results(results, best_model_name, metric_name, best_metric):
+    st.code(f"Best Model found is {best_model_name} yielding : {metric_name} : {best_metric}")
+    metrics_df = pd.DataFrame(results).T
+    with st.container(border=True):
+        col1,col2 = st.columns(2)
+        col1.markdown(f"#### :green[{metric_name}] comparison visualisation:")
+        col1.line_chart(metrics_df[[metric_name]], height=600, color="#57e140")
+        if metric_name == "rmse":
+            col2.markdown(f"#### :violet[R2] comparison visualisation:")
+            col2.line_chart(metrics_df["R2"], height=600, color="#9743e6")
+            scale_factor = metrics_df["rmse"].max() / 2   # Adjust factor to your liking
+            metrics_df["R2_scaled"] = metrics_df["R2"] * scale_factor
+
+            st.bar_chart(metrics_df.set_index("Model")[[metric_name, "R2_scaled"]], height=750, stack=False)
+        else:
+            col2.markdown(f"#### :violet[F1] comparison visualisation:")
+            col2.line_chart(metrics_df["F1"], height=600, color="#9743e6")
+            st.bar_chart(metrics_df[[metric_name, "F1"]], stack=False, height=650)
+
     st.success(f"🏆 **Best Model**: {best_model_name} ({metric_name}: {results[best_model_name][metric_name]:.3f})")
-    
     # 4. Download button for best model
     best_model = results[best_model_name]["Model"]
     with open("best_model.pkl", "wb") as f:
@@ -108,4 +115,4 @@ def smart_training(df, target_column):
         time.sleep(0.5)
     
     # Step 6: Display results
-    display_results(results, best_model, metric_name)
+    display_results(results, best_model, metric_name, best_metric)

@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from src import data_subj
 
 st.title("Search, Replace and Customize data")
 st.write("Search values from dataset, columns and replace them with ease, contains various other tools")
@@ -24,7 +25,7 @@ if uploaded_file is not None:
     
     st.subheader(":green[Rename Columns]")
     new_names = {}
-    st.write("##### Enter new names for the columns:")
+    st.code("Enter new names for the column:")
     # Display each column with a text input beside it
     st.markdown("""
     <style>
@@ -41,7 +42,7 @@ if uploaded_file is not None:
     """, unsafe_allow_html=True)
     for col in data.columns:
         c1, c2 = st.columns([0.3, 0.6])
-        c1.markdown(f"<div class='label-box'> {col} : </div>", unsafe_allow_html=True)
+        c1.markdown(f"<div class='label-box'> Rename {col} to : </div>", unsafe_allow_html=True)
         new_name = c2.text_input(
             "Enter the new name:",
             value=col,
@@ -65,3 +66,16 @@ if uploaded_file is not None:
         type="primary"
     )
     
+    st.subheader(":orange[Find and Replace]")
+    sclt = st.selectbox("Select the column to search and replace",data.columns)
+    df = data_subj.ReplaceVal(data, sclt)
+    if df is not None:
+        st.download_button(
+        label="Download edited csv",
+        data=df.to_csv(index=False).encode('utf-8'),
+        file_name="data_processed.csv",
+        mime="text/csv",
+        icon=":material/download:",
+        key=f"Edit_download2",
+        type="primary"
+        )

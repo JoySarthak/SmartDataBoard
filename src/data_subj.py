@@ -87,14 +87,17 @@ def SelectView(df, sclt_colmn, key_suffix: str = "1"):
             st.dataframe(df)
 
 def ReplaceVal(df, sclt_colmn):
-    with st.expander("Replace any value in column"):
+    with st.expander("Replace any value in column", expanded=True):
         r_val = st.text_input("Enter the value to be replaced")
         new_val = st.text_input("Enter the new value to replace")
+        if r_val:
+            r_val = value_convt(df,sclt_colmn,r_val)
+            st.subheader("Rows indentified for change : ")
+            st.dataframe(df[df[sclt_colmn] == r_val])
         if r_val and new_val:
             r_val = value_convt(df,sclt_colmn,r_val)
             new_val = value_convt(df,sclt_colmn,new_val)
-            st.subheader("Rows indentified for change : ")
-            st.dataframe(df[df[sclt_colmn] == r_val])
+            
         if st.button("Replace"):
             sdf = df.copy()
 
@@ -109,6 +112,7 @@ def ReplaceVal(df, sclt_colmn):
                 st.dataframe(sdf[changed_rows])  # ✅ Show full rows where replacement happened
             else:
                 st.info("No values were replaced.")
+            return sdf
 
 def Grouping(df, sclt_colmn):
     with st.expander("Groupby Insights"):

@@ -25,7 +25,7 @@ if uploaded_file is not None:
     st.success("File uploaded successfully!")
     df = pd.read_csv(uploaded_file)
     data_loader.Oversight(df)
-    with st.expander("View Options"):
+    with st.expander("View Options", expanded=True):
         sclt1 = st.selectbox("Choose what to view", ["Dataframe","Description","Info Overview"])
         if sclt1 == "Dataframe":
             data_loader.overview(df,"1")
