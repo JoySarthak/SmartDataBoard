@@ -60,8 +60,8 @@ for binary prediction choose a classification model''')
         target = st.selectbox("Select target (y)", df_model.drop(columns=features).columns)
         Regressor_m = st.selectbox(
             "**Choose a Regressor model**",
-            ["Linear Regression","Logistic Regression","KNN Regressor","Decision Tree Regressor",
-             "Support Vector Machine",
+            ["Linear Regression","KNN Regressor","Decision Tree Regressor",
+             "Support Vector Machine (R)",
              "Random Forest Regressor",
              "AdaBoost Regressor",
              "Gradient Boosting Regressor",
@@ -70,7 +70,7 @@ for binary prediction choose a classification model''')
         classification_m = st.selectbox(
             "**Choose a Classification model**",
             ["Logistic Regression","Decision Tree Classifier",
-             "KNN Classifier","Naive_Bayes Classifier","Support Vector Machine",
+             "KNN Classifier","Naive_Bayes Classifier","Support Vector Machine (C)",
              "Random Forest Classifier",
              "AdaBoost Classifier",
              "Gradient Boosting Classifier",
@@ -106,6 +106,7 @@ for binary prediction choose a classification model''')
                 data_models.evaluate_Multitarget_model(model, X_test, y_test)
             else:
                 data_models.evaluate_binary_model(model, X_test, y_test)
+            data_models.download_model(model)
                 
         with st.expander("Test Predictions : "):
         # Add prediction section after model training

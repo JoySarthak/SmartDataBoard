@@ -6,7 +6,7 @@ from xgboost import XGBClassifier, XGBRegressor
 from sklearn.linear_model import LinearRegression,LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.tree import DecisionTreeClassifier,DecisionTreeRegressor
-from sklearn.svm import SVC
+from sklearn.svm import SVC, SVR
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier,RandomForestRegressor, AdaBoostClassifier, AdaBoostRegressor, GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.metrics import (accuracy_score, f1_score, mean_absolute_error, precision_score,
@@ -33,15 +33,16 @@ def train_model(X_train, y_train, model_type):
     elif model_type == "Decision Tree Classifier":
         model = DecisionTreeClassifier()
     elif model_type == "Decision Tree Regressor":
-        model = DecisionTreeRegressor()
+        model = DecisionTreeRegressor(max_depth=7)
     elif model_type == "Random Forest Classifier":
         model = RandomForestClassifier()
     elif model_type == "Random Forest Regressor":
         model = RandomForestRegressor()
     elif model_type == "AdaBoost Classifier":
-        model = AdaBoostClassifier()
+        base_estimator = DecisionTreeClassifier(max_depth=9)
+        model = AdaBoostClassifier(estimator=base_estimator)
     elif model_type == "AdaBoost Regressor":
-        base_estimator = DecisionTreeRegressor(max_depth=4)
+        base_estimator = DecisionTreeRegressor(max_depth=9)
         model = AdaBoostRegressor(estimator=base_estimator)
     elif model_type == "Gradient Boosting Classifier":
         model = GradientBoostingClassifier()
@@ -51,8 +52,10 @@ def train_model(X_train, y_train, model_type):
         model = XGBClassifier()
     elif model_type == "XGBoost Regressor":
         model = XGBRegressor()
-    elif model_type == "Support Vector Machine":
-        model = SVC(kernel="poly")
+    elif model_type == "Support Vector Machine (C)":
+        model = SVC()
+    elif model_type == "Support Vector Machine (R)":
+        model = SVR()
     else:
         raise ValueError("Unknown model type")
     

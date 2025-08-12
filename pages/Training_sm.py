@@ -7,7 +7,7 @@ from Smart_tool import smart_train
 txt_msg = """The Smart Model uses AI to automatically check all the relative models suitable for your dataset
 once you upload and select your target variable, AI will automatically encode, compare model metrics and give you the best possible model."""
 
-st.header("Smart Model Training")
+st.title("Smart Model Training")
 st.markdown(":orange[Tired of checking all ML models manually?]:green[ Why not try out the Smart Model Training !]")
 
 def stream_data():

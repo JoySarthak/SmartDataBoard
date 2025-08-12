@@ -55,9 +55,10 @@ def display_results(results, best_model_name, metric_name, best_metric):
         if metric_name == "rmse":
             col2.markdown(f"#### :violet[R2] comparison visualisation:")
             col2.line_chart(metrics_df["R2"], height=600, color="#9743e6")
-            scale_factor = metrics_df["rmse"].max() / 2   # Adjust factor to your liking
+            st.markdown("##### Scaled R2 with RMSE Visualisation", help="Scaling helps to avoid distortion and provides a general understanding")
+            scale_factor = metrics_df["rmse"].max() / 2  
             metrics_df["R2_scaled"] = metrics_df["R2"] * scale_factor
-
+            st.markdown(f"Scale factor : :green[{scale_factor}]", help="Divide scaled value with scale_factor to get actual") 
             st.bar_chart(metrics_df.set_index("Model")[[metric_name, "R2_scaled"]], height=750, stack=False)
         else:
             col2.markdown(f"#### :violet[F1] comparison visualisation:")
@@ -67,9 +68,13 @@ def display_results(results, best_model_name, metric_name, best_metric):
     st.success(f"🏆 **Best Model**: {best_model_name} ({metric_name}: {results[best_model_name][metric_name]:.3f})")
     # 4. Download button for best model
     best_model = results[best_model_name]["Model"]
-    with open("best_model.pkl", "wb") as f:
-        pickle.dump(best_model, f)
-    st.download_button("Download Best Model", "best_model.pkl")
+    model_bytes = pickle.dumps(best_model)
+    st.download_button(
+        label="Download Best Model",
+        data=model_bytes,
+        file_name="best_model.pkl",
+        mime="application/octet-stream"
+    )
 
 def smart_training(df, target_column):
     with st.status(":material/network_intelligence: Smart Training in Progress...", expanded=True) as status:

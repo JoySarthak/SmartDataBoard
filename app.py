@@ -33,7 +33,7 @@ PAGES = {
     "SMART-TOOLS": {
         "Smart Tools": [
             {"title": "Smart-Training", "path": "pages/Training_sm.py"},
-            {"title": "Smart-Analysis", "path": "pages/Analytics_sm.py"}
+            {"title": "Auto-Tuning", "path": "pages/Tuning_sm.py"}
         ]
     }
 }
