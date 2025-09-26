@@ -5,7 +5,7 @@ import io
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime
-# The pathlib import is no longer needed
+from PIL import Image # <-- Import the Image module from Pillow
 
 # ML Imports
 from sklearn.model_selection import train_test_split
@@ -68,7 +68,7 @@ def create_professional_report(results, problem_type, best_model_info, target_co
     
     # --- Font Setup (Simplified) ---
     try:
-        # Now looking for fonts in the main project directory
+        # Looking for fonts in the main project directory
         pdf.add_font('Cascadia', '', 'CascadiaCode.ttf', uni=True)
         pdf.add_font('Cascadia', 'B', 'CascadiaCodeB.ttf', uni=True)
         pdf.add_font('Cascadia', 'I', 'CascadiaCodeItalic.ttf', uni=True)
@@ -130,8 +130,15 @@ def create_professional_report(results, problem_type, best_model_info, target_co
     buf = io.BytesIO()
     plt.savefig(buf, format='png', dpi=150)
     buf.seek(0)
-    pdf.image(buf, x=10, w=pdf.w - 20, type='PNG')
+    
+    # --- THE ROBUST FIX using Pillow ---
+    # Open the image from the buffer using Pillow
+    chart_image = Image.open(buf)
+    # Pass the Pillow image object to fpdf2, which is more reliable
+    pdf.image(chart_image, x=10, w=pdf.w - 20)
+    
     plt.close()
+    buf.close() # Good practice to close the buffer
     pdf.ln(5)
 
     # --- Detailed Metrics Section ---
