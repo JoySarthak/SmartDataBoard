@@ -67,7 +67,7 @@ def create_professional_report(results, problem_type, best_model_info, target_co
     pdf = PDF()
     
     # --- Font Setup ---
-    script_dir = Path(__file__).resolve().parent
+    #script_dir = Path(__file__).resolve().parent
     
     try:
         pdf.add_font('Cascadia', '', 'CascadiaCode.ttf', uni=True)
@@ -85,7 +85,6 @@ def create_professional_report(results, problem_type, best_model_info, target_co
     pdf.cell(0, 20, 'Model Performance Analysis', ln=1, align='C')
     pdf.set_font(font_family, '', 12)
     pdf.cell(0, 10, f"Report Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=1, align='C')
-    # --- ADDITION: Display the CSV filename ---
     pdf.cell(0, 10, f"Dataset: '{file_name}'", ln=1, align='C')
     pdf.cell(0, 10, f"Target Variable: '{target_column}'", ln=1, align='C')
     pdf.cell(0, 10, f"Analysis Type: {problem_type.title()}", ln=1, align='C')
@@ -132,7 +131,8 @@ def create_professional_report(results, problem_type, best_model_info, target_co
     buf = io.BytesIO()
     plt.savefig(buf, format='png', dpi=150)
     buf.seek(0)
-    pdf.image(buf, x=10, w=pdf.w - 20)
+    # --- FIX APPLIED HERE ---
+    pdf.image(buf, x=10, w=pdf.w - 20, type='PNG')
     plt.close()
     pdf.ln(5)
 
@@ -164,7 +164,6 @@ prompt = st.chat_input(
 )
 
 if prompt and "files" in prompt and prompt["files"]:
-    # --- ADDITION: Get file object and name ---
     uploaded_file = prompt["files"][0]
     csv_filename = uploaded_file.name
     df_uploaded = pd.read_csv(io.BytesIO(uploaded_file.getvalue()))
@@ -225,7 +224,6 @@ if prompt and "files" in prompt and prompt["files"]:
         
         best_model_info = get_best_model(results, mode)
         
-        # --- ADDITION: Pass filename to the function ---
         pdf_data = create_professional_report(results, mode, best_model_info, target_column, csv_filename)
         
         st.download_button(
