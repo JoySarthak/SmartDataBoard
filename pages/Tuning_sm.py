@@ -5,7 +5,7 @@ import io
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime
-from pathlib import Path
+# The pathlib import is no longer needed
 
 # ML Imports
 from sklearn.model_selection import train_test_split
@@ -66,16 +66,15 @@ def create_professional_report(results, problem_type, best_model_info, target_co
     
     pdf = PDF()
     
-    # --- Font Setup ---
-    #script_dir = Path(__file__).resolve().parent
-    
+    # --- Font Setup (Simplified) ---
     try:
+        # Now looking for fonts in the main project directory
         pdf.add_font('Cascadia', '', 'CascadiaCode.ttf', uni=True)
         pdf.add_font('Cascadia', 'B', 'CascadiaCodeB.ttf', uni=True)
         pdf.add_font('Cascadia', 'I', 'CascadiaCodeItalic.ttf', uni=True)
         font_family = 'Cascadia'
     except FileNotFoundError:
-        st.warning("Cascadia Code font files not found in the 'pages' directory. Falling back to Helvetica.")
+        st.warning("Cascadia Code font files not found in the main project directory. Falling back to Helvetica.")
         font_family = 'Helvetica'
     
     pdf.add_page()
@@ -131,7 +130,6 @@ def create_professional_report(results, problem_type, best_model_info, target_co
     buf = io.BytesIO()
     plt.savefig(buf, format='png', dpi=150)
     buf.seek(0)
-    # --- FIX APPLIED HERE ---
     pdf.image(buf, x=10, w=pdf.w - 20, type='PNG')
     plt.close()
     pdf.ln(5)
