@@ -1,248 +1,237 @@
-# Analytics_sm.py
 import streamlit as st
 import pandas as pd
-import pickle
-import optuna
-from sklearn.model_selection import cross_val_score
-from sklearn.preprocessing import LabelEncoder
-from sklearn.base import is_classifier
 import numpy as np
+import io
+import matplotlib.pyplot as plt
+import seaborn as sns
+from datetime import datetime
+from pathlib import Path
 
-# ========================================
-# 1. Detect Model Type
-# ========================================
-def detect_model_type(model):
-    return model.__class__.__name__, model.__class__
+# ML Imports
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.metrics import (
+    accuracy_score, f1_score, precision_score, recall_score,
+    r2_score, mean_absolute_error, mean_squared_error, explained_variance_score
+)
 
-# ========================================
-# 2. Auto Encode Non-Numeric Columns
-# ========================================
-def encode_non_numeric(df):
-    for col in df.select_dtypes(include=['object', 'category']).columns:
-        df[col] = LabelEncoder().fit_transform(df[col].astype(str))
-    return df
+# Replace with your actual model fetching function
+from Smart_tool import getModels 
 
-# ========================================
-# 3. Parameter Space
-# ========================================
-def get_param_space(model_cls):
-    name = model_cls.__name__
+# PDF Generation
+from fpdf import FPDF
 
-    spaces = {
-        # Classification models
-        "LogisticRegression": {
-            "C": (0.01, 10, "float_log"),
-            "solver": (["lbfgs", "liblinear", "newton-cg", "sag", "saga"], "categorical"),
-            "max_iter": (100, 500, "int"),
-            "penalty": (["l1", "l2", "elasticnet", "none"], "categorical")
-        },
-        "RandomForestClassifier": {
-            "n_estimators": (50, 300, "int"),
-            "max_depth": (2, 20, "int_or_none"),
-            "min_samples_split": (2, 10, "int"),
-            "min_samples_leaf": (1, 5, "int"),
-            "max_features": (["sqrt", "log2", None], "categorical"),
-            "bootstrap": ([True, False], "categorical")
-        },
-        "GradientBoostingClassifier": {
-            "n_estimators": (50, 300, "int"),
-            "learning_rate": (0.01, 0.2, "float_log"),
-            "max_depth": (2, 10, "int"),
-            "min_samples_split": (2, 10, "int"),
-            "min_samples_leaf": (1, 5, "int"),
-            "max_features": (["sqrt", "log2", None], "categorical")
-        },
-        "AdaBoostClassifier": {
-            "n_estimators": (50, 300, "int"),
-            "learning_rate": (0.01, 1.0, "float"),
-            "algorithm": (["SAMME", "SAMME.R"], "categorical")
-        },
-        "DecisionTreeClassifier": {
-            "max_depth": (2, 20, "int_or_none"),
-            "min_samples_split": (2, 10, "int"),
-            "min_samples_leaf": (1, 5, "int"),
-            "max_features": (["sqrt", "log2", None], "categorical"),
-            "criterion": (["gini", "entropy"], "categorical")
-        },
-        "KNeighborsClassifier": {
-            "n_neighbors": (3, 15, "int"),
-            "weights": (["uniform", "distance"], "categorical"),
-            "p": (1, 2, "int")
-        },
-        "SVC": {
-            "C": (0.01, 10, "float_log"),
-            "kernel": (["linear", "rbf", "poly", "sigmoid"], "categorical"),
-            "gamma": (["scale", "auto"], "categorical"),
-            "degree": (2, 5, "int")
-        },
-        "XGBClassifier": {
-            "n_estimators": (50, 300, "int"),
-            "max_depth": (2, 10, "int"),
-            "learning_rate": (0.01, 0.3, "float_log"),
-            "subsample": (0.5, 1.0, "float"),
-            "colsample_bytree": (0.5, 1.0, "float"),
-            "gamma": (0, 5, "float"),
-            "min_child_weight": (1, 10, "int")
-        },
+# --- 1. Best Model Identification Function ---
+def get_best_model(results, problem_type):
+    """
+    Identifies the best model from a dictionary of results based on a primary metric.
+    """
+    if not results:
+        return None, None, None
 
-        # Regression models
-        "LinearRegression": {
-            "fit_intercept": ([True, False], "categorical")
-        },
-        "RandomForestRegressor": {
-            "n_estimators": (50, 300, "int"),
-            "max_depth": (2, 20, "int_or_none"),
-            "min_samples_split": (2, 10, "int"),
-            "min_samples_leaf": (1, 5, "int"),
-            "max_features": (["sqrt", "log2", None], "categorical"),
-            "bootstrap": ([True, False], "categorical")
-        },
-        "GradientBoostingRegressor": {
-            "n_estimators": (50, 300, "int"),
-            "learning_rate": (0.01, 0.2, "float_log"),
-            "max_depth": (2, 10, "int"),
-            "min_samples_split": (2, 10, "int"),
-            "min_samples_leaf": (1, 5, "int"),
-            "max_features": (["sqrt", "log2", None], "categorical"),
-            "loss": (["squared_error", "absolute_error", "huber", "quantile"], "categorical")
-        },
-        "KNeighborsRegressor": {
-            "n_neighbors": (3, 15, "int"),
-            "weights": (["uniform", "distance"], "categorical"),
-            "p": (1, 2, "int")
-        },
-        "SVR": {
-            "C": (0.01, 10, "float_log"),
-            "kernel": (["linear", "rbf", "poly", "sigmoid"], "categorical"),
-            "gamma": (["scale", "auto"], "categorical"),
-            "degree": (2, 5, "int"),
-            "epsilon": (0.01, 0.2, "float")
-        },
-        "XGBRegressor": {
-            "n_estimators": (50, 300, "int"),
-            "max_depth": (2, 10, "int"),
-            "learning_rate": (0.01, 0.3, "float_log"),
-            "subsample": (0.5, 1.0, "float"),
-            "colsample_bytree": (0.5, 1.0, "float"),
-            "gamma": (0, 5, "float"),
-            "min_child_weight": (1, 10, "int")
-        },
-        "AdaBoostRegressor": {
-            "n_estimators": (50, 300, "int"),
-            "learning_rate": (0.01, 1.0, "float"),
-            "loss": (["linear", "square", "exponential"], "categorical")
-        },
-        "DecisionTreeRegressor": {
-            "max_depth": (2, 20, "int_or_none"),
-            "min_samples_split": (2, 10, "int"),
-            "min_samples_leaf": (1, 5, "int"),
-            "max_features": (["sqrt", "log2", None], "categorical"),
-            "criterion": (["squared_error", "friedman_mse", "absolute_error"], "categorical")
-        }
-    }
-    return spaces.get(name, {})
+    if problem_type.lower() == "classification":
+        best_model_name = max(results, key=lambda x: results[x]["Accuracy"])
+        best_metric = results[best_model_name]["Accuracy"]
+        metric_name = "Accuracy"
+    else:
+        best_model_name = min(results, key=lambda x: results[x]["Root Mean Squared Error"])
+        best_metric = results[best_model_name]["Root Mean Squared Error"]
+        metric_name = "Root Mean Squared Error"
+    
+    return best_model_name, best_metric, metric_name
 
-# ========================================
-# 4. Suggest Param Helper (fixed order)
-# ========================================
-def suggest_param(trial, name, value):
-    if isinstance(value, tuple) and value[-1] == "categorical":
-        return trial.suggest_categorical(name, value[0])
-    elif isinstance(value, tuple):
-        if value[-1] == "int":
-            return trial.suggest_int(name, value[0], value[1])
-        elif value[-1] == "float":
-            return trial.suggest_float(name, value[0], value[1])
-        elif value[-1] == "float_log":
-            return trial.suggest_float(name, value[0], value[1], log=True)
-        elif value[-1] == "int_or_none":
-            return trial.suggest_categorical(name, [None] + list(range(value[0], value[1] + 1)))
-    elif isinstance(value, list):
-        return trial.suggest_categorical(name, value)
-    return None
+# --- 2. Professional PDF Report Generation Function ---
+class PDF(FPDF):
+    def header(self):
+        try:
+            self.set_font('Cascadia', 'B', 12)
+        except RuntimeError:
+            self.set_font('Helvetica', 'B', 12)
+        self.cell(0, 10, 'Automated Machine Learning Report', 0, 1, 'C')
+        self.ln(5)
 
-# ========================================
-# 5. Objective Function with auto scoring
-# ========================================
-from sklearn.base import is_classifier
+    def footer(self):
+        self.set_y(-15)
+        try:
+            self.set_font('Cascadia', 'I', 8)
+        except RuntimeError:
+            self.set_font('Helvetica', 'I', 8)
+        self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
 
-def tune_model(model_cls, param_space, X, y, n_trials=20):
-    def objective(trial):
-        params = {pname: suggest_param(trial, pname, pval) for pname, pval in param_space.items()}
-        model = model_cls(**params)
+def create_professional_report(results, problem_type, best_model_info, target_column, file_name):
+    """
+    Generates a professional PDF report with custom fonts, charts, and analysis.
+    """
+    best_model_name, best_metric, metric_name = best_model_info
+    
+    pdf = PDF()
+    
+    # --- Font Setup ---
+    script_dir = Path(__file__).resolve().parent
+    
+    try:
+        pdf.add_font('Cascadia', '', 'CascadiaCode.ttf', uni=True)
+        pdf.add_font('Cascadia', 'B', 'CascadiaCodeB.ttf', uni=True)
+        pdf.add_font('Cascadia', 'I', 'CascadiaCodeItalic.ttf', uni=True)
+        font_family = 'Cascadia'
+    except FileNotFoundError:
+        st.warning("Cascadia Code font files not found in the 'pages' directory. Falling back to Helvetica.")
+        font_family = 'Helvetica'
+    
+    pdf.add_page()
+    
+    # --- Title Page ---
+    pdf.set_font(font_family, 'B', 24)
+    pdf.cell(0, 20, 'Model Performance Analysis', ln=1, align='C')
+    pdf.set_font(font_family, '', 12)
+    pdf.cell(0, 10, f"Report Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=1, align='C')
+    # --- ADDITION: Display the CSV filename ---
+    pdf.cell(0, 10, f"Dataset: '{file_name}'", ln=1, align='C')
+    pdf.cell(0, 10, f"Target Variable: '{target_column}'", ln=1, align='C')
+    pdf.cell(0, 10, f"Analysis Type: {problem_type.title()}", ln=1, align='C')
+    pdf.ln(20)
 
-        if is_classifier(model):
-            scoring = "accuracy"
-        else:
-            scoring = "neg_root_mean_squared_error"  # RMSE but negative
+    # --- Summary Section ---
+    pdf.set_font(font_family, 'B', 16)
+    pdf.cell(0, 10, '1. Executive Summary', ln=1)
+    pdf.set_font(font_family, '', 11)
+    summary_text = (
+        f"This report details the performance of several machine learning models. "
+        f"Based on the analysis, the best performing model is '{best_model_name}' "
+        f"with a top {metric_name} of {best_metric:.4f}."
+    )
+    pdf.multi_cell(0, 8, summary_text)
+    pdf.ln(10)
 
-        score = cross_val_score(model, X, y, cv=3, scoring=scoring).mean()
-        return score
+    # --- Comparison Chart Section ---
+    pdf.set_font(font_family, 'B', 16)
+    pdf.cell(0, 10, '2. Model Performance Comparison', ln=1)
+    
+    plot_data = []
+    for model, metrics in results.items():
+        plot_data.append({'Model': model, metric_name: metrics[metric_name]})
+    df_plot = pd.DataFrame(plot_data)
 
-    study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=n_trials)
+    plt.figure(figsize=(10, 6))
+    sns.set_style("whitegrid")
+    bar_plot = sns.barplot(x='Model', y=metric_name, data=df_plot, palette='viridis')
+    plt.title(f'Model Comparison by {metric_name}', fontsize=16)
+    plt.xlabel('Model', fontsize=12)
+    plt.ylabel(metric_name, fontsize=12)
+    plt.xticks(rotation=45, ha='right')
+    
+    for p in bar_plot.patches:
+        bar_plot.annotate(format(p.get_height(), '.4f'), 
+                           (p.get_x() + p.get_width() / 2., p.get_height()), 
+                           ha = 'center', va = 'center', 
+                           xytext = (0, 9), 
+                           textcoords = 'offset points')
 
-    # Adjust score for regression so RMSE is positive
-    best_score = study.best_value
-    if not is_classifier(model_cls()):
-        best_score = -best_score  # convert negative RMSE to positive
+    plt.tight_layout()
+    
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', dpi=150)
+    buf.seek(0)
+    pdf.image(buf, x=10, w=pdf.w - 20)
+    plt.close()
+    pdf.ln(5)
 
-    return study.best_params, best_score
+    # --- Detailed Metrics Section ---
+    pdf.add_page()
+    pdf.set_font(font_family, 'B', 16)
+    pdf.cell(0, 10, '3. Detailed Model Metrics', ln=1)
+    
+    for model_name, metrics in results.items():
+        pdf.set_font(font_family, 'B', 14)
+        pdf.cell(0, 10, f"-> {model_name}", ln=1)
+        pdf.set_font(font_family, '', 11)
+        for metric, value in metrics.items():
+            pdf.cell(0, 8, f"{'':<5}- {metric.replace('_', ' ').title()}: {value:.4f}", ln=1)
+        pdf.ln(5)
 
-# ========================================
-# 6. Save Model
-# ========================================
-def save_model(model, filename="tuned_model.pkl"):
-    with open(filename, "wb") as f:
-        pickle.dump(model, f)
-    return filename
+    return bytes(pdf.output())
 
-# ========================================
-# 7. Streamlit UI
-# ========================================
-st.title("📈 Auto-Tuning hyperparameters for ML Models : ")
-st.write("Increase the performance of your machine learning model using Auto-Tuning Tailored for your dataset")
+# --- Your Main Streamlit App Logic (Remains the same) ---
 
-uploaded_model_file = st.file_uploader("Upload trained model (.pkl)", type=["pkl"])
-uploaded_data_file = st.file_uploader("Upload dataset (CSV)", type=["csv"])
+st.title("Generate reports")
+st.write("Generate pdf report with proper metrics information and comparison charts by default all models are selected unless mentioned specifically")
+mode = st.radio("Select Mode : ",["regression","classification"], horizontal=True)
 
-if uploaded_data_file:
-    df = pd.read_csv(uploaded_data_file)
-    target_col = st.selectbox("Select the target on which the model was trained:", df.columns, index=0)
-    n_trials = st.number_input("Number of tuning trials", min_value=5, max_value=100, value=20)
+prompt = st.chat_input(
+    "Upload csv / Type Generate report along target column name pls adhere to case",
+    accept_file=True,
+    file_type=["csv"],
+)
 
-    if st.button(":material/network_intelligence: AI Auto Tune"):
-        if uploaded_model_file and target_col:
-            try:
-                model = pickle.load(uploaded_model_file)
+if prompt and "files" in prompt and prompt["files"]:
+    # --- ADDITION: Get file object and name ---
+    uploaded_file = prompt["files"][0]
+    csv_filename = uploaded_file.name
+    df_uploaded = pd.read_csv(io.BytesIO(uploaded_file.getvalue()))
+    target_column = df_uploaded.columns[-1]
+    
+    prompt_text_lower = prompt['text'].lower()
+    for col_name in df_uploaded.columns:
+        if col_name.lower() in prompt_text_lower:
+            target_column = col_name
+            break
 
-                X = df.drop(columns=[target_col])
-                y = df[target_col]
+    with st.chat_message("user"):
+        st.markdown(f"Preview of **{csv_filename}**")
+        st.dataframe(df_uploaded.head(5))
+        st.markdown(f"Encoding dataset... Target column is **{target_column}**")
+        encoder = OrdinalEncoder()
+        categorical_cols = df_uploaded.select_dtypes(include=['object', 'category']).columns
+        if len(categorical_cols) > 0:
+            df_uploaded[categorical_cols] = encoder.fit_transform(df_uploaded[categorical_cols])
+        
+        target = df_uploaded[target_column]
+        def_mode = "binary" if target.nunique() <= 2 else "macro"
 
-                # Encode non-numeric features
-                X = encode_non_numeric(X)
+    models = getModels.get_models(mode)
 
-                # Detect model
-                model_name, model_cls = detect_model_type(model)
-                st.write(f"**Detected Model:** {model_name}")
+    if "generate" in prompt['text'].lower():
+        with st.spinner(f"Training {len(models)} models..."):
+            x = df_uploaded.drop(columns=[target_column])
+            y = df_uploaded[target_column]
+            results = {} 
+            X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
 
-                # Get parameter space
-                param_space = get_param_space(model_cls)
-                if not param_space:
-                    st.error("❌ This model type is not supported yet for auto-tuning.")
-                else:
-                    with st.spinner("Tuning in progress..."):
-                        best_params, best_score = tune_model(model_cls, param_space, X, y, n_trials=n_trials)
+            progress_bar = st.progress(0, "Initializing...")
+            for i, (name, model) in enumerate(models.items()):
+                progress_bar.progress((i) / len(models), text=f"Training {name}...")
+                model.fit(X_train, y_train)
+                y_pred = model.predict(X_test)
 
-                    st.success(f"✅ Best Score: {best_score:.4f}")
-                    st.write("**Best Parameters:**", best_params)
+                if mode == "classification":
+                    results[name] = {
+                        "Accuracy": accuracy_score(y_test, y_pred),
+                        "F1 Score": f1_score(y_test, y_pred, average=def_mode),
+                        "Precision": precision_score(y_test, y_pred, average=def_mode),
+                        "Recall": recall_score(y_test, y_pred, average=def_mode)
+                    }
+                else: # Regression
+                    results[name] = {
+                        "R2 Score": r2_score(y_test, y_pred),
+                        "Mean Absolute Error": mean_absolute_error(y_test, y_pred),
+                        "Root Mean Squared Error": np.sqrt(mean_squared_error(y_test, y_pred)),
+                        "Explained Variance Score": explained_variance_score(y_test, y_pred)
+                    }
+            progress_bar.progress(1.0, "Evaluation complete!")
+        
+        st.success("All models have been trained and evaluated!")
+        
+        st.markdown("### Download Your Report")
+        
+        best_model_info = get_best_model(results, mode)
+        
+        # --- ADDITION: Pass filename to the function ---
+        pdf_data = create_professional_report(results, mode, best_model_info, target_column, csv_filename)
+        
+        st.download_button(
+            label="⬇️ Download Professional Report",
+            data=pdf_data,
+            file_name=f"professional_report_{mode}.pdf",
+            mime="application/pdf"
+        )
 
-                    tuned_model = model_cls(**best_params)
-                    tuned_model.fit(X, y)
-
-                    tuned_filename = save_model(tuned_model)
-                    with open(tuned_filename, "rb") as f:
-                        st.download_button("⬇️ Download Tuned Model", f, file_name="tuned_model.pkl")
-
-            except Exception as e:
-                st.error(f"Error: {str(e)}")

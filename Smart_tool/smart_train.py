@@ -21,11 +21,11 @@ def train_and_evaluate(models, X, y, typeT, progress_bar, status):
             if typeT.lower() == "classification":
                 score = accuracy_score(y_test, y_pred)
                 score_f1 = f1_score(y_test, y_pred)
-                results[name] = {"accuracy": score, "Model": model, "F1" : score_f1}
+                results[name] = {"Accuracy": score, "Model": model, "F1" : score_f1}
             else:  # Regression
                 score = np.sqrt(mean_squared_error(y_test, y_pred))
                 score_r2 = r2_score(y_test, y_pred)
-                results[name] = {"rmse": score, "Model": model, "R2": score_r2}
+                results[name] = {"Root Mean Squared Error": score, "Model": model, "R2": score_r2}
             
             progress = (i + 1) / total_models
             progress_bar.progress(min(progress, 1.0))
@@ -35,13 +35,13 @@ def train_and_evaluate(models, X, y, typeT, progress_bar, status):
 
 def get_best_model(results, problem_type):
     if problem_type.lower() == "classification":
-        best_model_name = max(results, key=lambda x: results[x]["accuracy"])
-        best_metric = results[best_model_name]["accuracy"]
-        metric_name = "accuracy"
+        best_model_name = max(results, key=lambda x: results[x]["Accuracy"])
+        best_metric = results[best_model_name]["Accuracy"]
+        metric_name = "Accuracy"
     else:  # Regression
-        best_model_name = min(results, key=lambda x: results[x]["rmse"])
-        best_metric = results[best_model_name]["rmse"]
-        metric_name = "rmse"
+        best_model_name = min(results, key=lambda x: results[x]["Root Mean Squared Error"])
+        best_metric = results[best_model_name]["Root Mean Squared Error"]
+        metric_name = "Root Mean Squared Error"
     
     return best_model_name, best_metric, metric_name
 
@@ -51,18 +51,18 @@ def display_results(results, best_model_name, metric_name, best_metric):
     with st.container(border=True):
         col1,col2 = st.columns(2)
         col1.markdown(f"#### :green[{metric_name}] comparison visualisation:")
-        col1.line_chart(metrics_df[[metric_name]], height=600, color="#57e140")
-        if metric_name == "rmse":
+        col1.bar_chart(metrics_df[[metric_name]], height=600, color="#57e140")
+        if metric_name == "Root Mean Squared Error":
             col2.markdown(f"#### :violet[R2] comparison visualisation:")
-            col2.line_chart(metrics_df["R2"], height=600, color="#9743e6")
-            st.markdown("##### Scaled R2 with RMSE Visualisation", help="Scaling helps to avoid distortion and provides a general understanding")
-            scale_factor = metrics_df["rmse"].max() / 2  
+            col2.bar_chart(metrics_df["R2"], height=600, color="#9743e6")
+            st.markdown("##### Scaled R2 with Root Mean Squared Error Visualisation", help="Scaling helps to avoid distortion and provides a general understanding")
+            scale_factor = metrics_df["Root Mean Squared Error"].max() / 2  
             metrics_df["R2_scaled"] = metrics_df["R2"] * scale_factor
             st.markdown(f"Scale factor : :green[{scale_factor}]", help="Divide scaled value with scale_factor to get actual") 
             st.bar_chart(metrics_df.set_index("Model")[[metric_name, "R2_scaled"]], height=750, stack=False)
         else:
             col2.markdown(f"#### :violet[F1] comparison visualisation:")
-            col2.line_chart(metrics_df["F1"], height=600, color="#9743e6")
+            col2.bar_chart(metrics_df["F1"], height=600, color="#9743e6")
             st.bar_chart(metrics_df[[metric_name, "F1"]], stack=False, height=650)
 
     st.success(f"🏆 **Best Model**: {best_model_name} ({metric_name}: {results[best_model_name][metric_name]:.3f})")

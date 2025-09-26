@@ -62,6 +62,39 @@ def train_model(X_train, y_train, model_type):
     model.fit(X_train, y_train)
     return model
 
+def evaluate_weighted_avg_model(model, X_test, y_test):
+    y_pred = model.predict(X_test)
+    st.markdown("## :green[Model Evaluation:]")
+    a, b = st.columns(2)
+    c, d = st.columns(2)
+
+    # Classification metrics
+    a.metric(":green[Accuracy]", f"{accuracy_score(y_test, y_pred):.4f}",help="Accuracy is the most straightforward metric and measures " \
+            "the proportion of all classifications that were correct. Evaluates the performance of the model",border=True)
+    b.metric(":orange[Precision]", f"{precision_score(y_test, y_pred, average="macro"):.4f}", help="Precision measures the accuracy of the positive predictions" 
+            "It answers the question: Of all the items the model labeled as positive, how many were actually positive?", border=True)
+    c.metric(":blue[Recall]", f"{recall_score(y_test, y_pred, average="macro"):.4f}", border=True, help="Recall, also known as sensitivity or the true positive rate, " \
+            "measures the model's ability to find all the actual positive instances. "
+            "It answers the question: Of all the actual positives, how many did the model correctly identify?")
+    d.metric(":violet[F1 Score]", f"{f1_score(y_test, y_pred, average="macro"):.4f}", border=True, help="The F1 score is the harmonic mean of precision and recall. " \
+            "It combines both metrics into a single number, providing a balance between them.")
+    
+    with st.expander("View detailed: "):
+        c1,c2 = st.columns(2)
+        with c1:
+            st.markdown("#### :violet-background[Confusion Matrix:]")
+            cm = confusion_matrix(y_test, y_pred)
+            fig = px.imshow(cm, text_auto=True, color_continuous_scale="GnBu")
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with c2:
+            st.markdown("#### :blue-background[Classification Report:]")
+            st.container(height=40, border=False)
+            report_dict = classification_report(y_test, y_pred, output_dict=True)
+            df = pd.DataFrame(report_dict).transpose()
+            st.dataframe(df)
+            
+
 def evaluate_Multitarget_model(model, X_test, y_test):
     y_pred = model.predict(X_test)
     st.markdown("## :green[Model Evaluation:]")
@@ -133,7 +166,7 @@ def evaluate_binary_model(model, X_test, y_test):
     # Classification metrics
     a.metric(":green[Accuracy]", f"{accuracy_score(y_test, y_pred):.4f}",help="Accuracy is the most straightforward metric and measures " \
             "the proportion of all classifications that were correct. Evaluates the performance of the model",border=True)
-    b.metric(":orange[Precision]", f"{precision_score(y_test, y_pred):.4f}", help="Precision measures the accuracy of the positive predictions" 
+    b.metric(":orange[Precision]", f"{precision_score(y_test, y_pred, average="binary"):.4f}", help="Precision measures the accuracy of the positive predictions" 
             "It answers the question: Of all the items the model labeled as positive, how many were actually positive?", border=True)
     c.metric(":blue[Recall]", f"{recall_score(y_test, y_pred):.4f}", border=True, help="Recall, also known as sensitivity or the true positive rate, " \
             "measures the model's ability to find all the actual positive instances. "

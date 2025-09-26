@@ -91,8 +91,9 @@ for binary prediction choose a classification model''')
         y = df_model[target]
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        select = st.radio("Select Metrics type : ", ["Multi-class","Binary"], horizontal=True, help="select Multi-class when target consists of wide"
-        " range of values for prediction and select Binary when target only consists of yes/no for prediction. !for linear models always select Multi-class")
+        select = st.radio("Select Metrics type : ", ["Multi","Binary","W_AVG"], horizontal=True, help="Multi : Target Variable has multiple prediction labels Regression Models"
+        " Binary : 0 or 1 classification target variable is restricted to only yes or no classification"
+        " W_AVG : Target variable has limited number of labels to classify and predict from.")
         if 'trained_model' not in st.session_state:
             st.session_state.trained_model = None
             
@@ -102,8 +103,10 @@ for binary prediction choose a classification model''')
             
         if st.session_state.trained_model is not None:  
             model = st.session_state.trained_model
-            if select == "Multi-class":
+            if select == "Multi":
                 data_models.evaluate_Multitarget_model(model, X_test, y_test)
+            elif select == "W_AVG":
+                data_models.evaluate_weighted_avg_model(model, X_test, y_test)
             else:
                 data_models.evaluate_binary_model(model, X_test, y_test)
             data_models.download_model(model)
@@ -146,7 +149,7 @@ for binary prediction choose a classification model''')
                     if has_encodings and target in st.session_state.encoders:
                         target_encoder = st.session_state.encoders[target]
                         # For classification, use inverse_transform
-                        if select == "Binary" or select == "Multi-class":
+                        if select in ["Binary","Multi","W_AVG"]:
                             decoded_prediction = target_encoder.inverse_transform(prediction.reshape(-1, 1))[0][0]
                             st.success(f"Predicted {target}: {decoded_prediction}")
                         # For regression with encoded target (less common), you might need different handling

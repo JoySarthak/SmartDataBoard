@@ -17,7 +17,7 @@ def get_models(problem_type):
             "SVC": SVC(kernel='poly'),
             "XGB Classifier": XGBClassifier(),
         }
-    else:  # Regression
+    else:
         return {
             "Linear Regression": LinearRegression(),
             "Random Forest Regressor": RandomForestRegressor(),
