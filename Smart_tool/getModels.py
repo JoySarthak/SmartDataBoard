@@ -15,7 +15,7 @@ def get_models(problem_type):
             "Decision Tree Classifier": DecisionTreeClassifier(),
             "KNeighbors Classifier": KNeighborsClassifier(n_neighbors=5, weights="distance"),
             "SVC": SVC(kernel='poly'),
-            "XGB Classifier": XGBClassifier(),
+            #"XGB Classifier": XGBClassifier(),
         }
     else:
         return {
@@ -24,7 +24,7 @@ def get_models(problem_type):
             "Gradient Boosting Regressor": GradientBoostingRegressor(),
             "KNeighbors Regressor": KNeighborsRegressor(),
             "SVR": SVR(kernel='poly'),
-            "XGB Regressor": XGBRegressor(),
+            #"XGB Regressor": XGBRegressor(),
             "ADA Boosting Regressor": AdaBoostRegressor(estimator=DecisionTreeRegressor(max_depth=7)),
             "Decision Tree Regressor": DecisionTreeRegressor(),
         }
